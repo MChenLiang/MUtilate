@@ -219,13 +219,13 @@ class progress_bar(exUI.QDialog):
 
     def accept(self):
         self.movie.stop()
-        self.movie.deleteLater()
+        exUI.deleteUI(self.movie.objectName())
         super(progress_bar, self).accept()
 
     def reject(self):
         if pg_conf.progress_func_conf:
             self.movie.stop()
-            self.movie.deleteLater()
+            exUI.deleteUI(self.movie.objectName())
             super(progress_bar, self).reject()
 
 
@@ -241,7 +241,7 @@ class m_thread(exUI.QThread):
     def run(self):
         self.func(*self.args, **self.kwargs)
         pg_conf.progress_func_conf = True
-        self.UI_object.deleteLater()
+        exUI.deleteUI(self.UI_object.objectName())
 
 
 def show(*args, **kwargs):
