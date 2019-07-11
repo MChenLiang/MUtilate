@@ -255,4 +255,4 @@ def show(*args, **kwargs):
         pg_conf.progress_func_conf = True
         exUI.deleteUI(dlg.objectName())
     dlg.exec_()
-    return dlg.result()
+    return
