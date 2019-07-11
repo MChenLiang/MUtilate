@@ -36,20 +36,7 @@ def _pro():
         time.sleep(0.1)
         pg_conf.progress_current_val = i
         pg_conf.progress_label = "Had Finished {}%!!".format(i)
-        print pg_conf.progress_current_val
 
 
 def testPro():
     partial(show_progress, "txt_", None, _pro)()
-
-
-"""
-import sys
-in_path = ''
-
-in_path in sys.path or sys.path.append(in_path)
-
-from MUtils import openUI
-reload(openUI)
-openUI.testPro()
-"""
