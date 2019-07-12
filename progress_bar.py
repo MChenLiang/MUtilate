@@ -157,7 +157,7 @@ class progress_bar(exUI.QDialog):
         self.movie.frameChanged.connect(self.on_next)
         pass
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+    # +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ #
     def on_next(self):
         """
         frame key
@@ -181,9 +181,7 @@ class progress_bar(exUI.QDialog):
         offset = progress_current_val * 1.00 / progress_max_val * (self.pos_x + of_x)
         self.label_movie.setGeometry(self.pos_x - offset, 10, of_x, of_y)
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-    # super ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+    # +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ #
     def mousePressEvent(self, event):
         if event.buttons() == exUI.Qt.LeftButton:
             self.c_pos = event.globalPos() - self.pos()
@@ -219,20 +217,22 @@ class progress_bar(exUI.QDialog):
 
     def accept(self):
         self.movie.stop()
-        exUI.deleteUI(self.movie.objectName())
+        self.movie.deleteLater()
         super(progress_bar, self).accept()
 
     def reject(self):
         if pg_conf.progress_func_conf:
             self.movie.stop()
+            # self.movie.deleteLater()
             exUI.deleteUI(self.movie.objectName())
             super(progress_bar, self).reject()
 
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ #
+
 class m_thread(exUI.QThread):
-    def __init__(self, func, UI_object, *args, **kwargs):
-        super(m_thread, self).__init__(exUI.GetMayaMainWindow())
+    def __init__(self, func, UI_object, parent_UI, *args, **kwargs):
+        super(m_thread, self).__init__(parent_UI)
         self.func = func
         self.UI_object = UI_object
         self.args = args
@@ -249,7 +249,8 @@ def show(*args, **kwargs):
     args = args[3:]
     dlg = progress_bar(obj_name, parent=parent_UI)
     if hasattr(func, "__call__"):
-        pg_conf.progress_thread = m_thread(func, dlg, *args, **kwargs)
+        mayaWindow = exUI.GetMayaMainWindow()
+        pg_conf.progress_thread = m_thread(func, dlg, mayaWindow, *args, **kwargs)
         pg_conf.progress_thread.start()
     else:
         pg_conf.progress_func_conf = True

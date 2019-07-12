@@ -15,9 +15,9 @@ import xml
 import cStringIO
 
 import maya.OpenMayaUI as mui
-import pymel.core as pm
+import maya.cmds as cmds
 
-maya_qt_ver = int(re.match('\d', pm.about(qt=True)).group())
+maya_qt_ver = int(re.match('\d', cmds.about(qt=True)).group())
 
 # proc function -+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ #
 # function main -+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ #
@@ -63,7 +63,6 @@ if maya_qt_ver == 5:
 
 
 # --+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+--#
-
 def GetMayaLayout(layoutString):
     ptr = mui.MQtUtil.findLayout(layoutString)
     if ptr:
@@ -77,7 +76,10 @@ def GetWindow(windowName):
 
 
 def GetFullName(qObj):
-    pointer = sip.unwrapinstance(qObj)
+    if USE_PYQT_MODULE:
+        pointer = sip.unwrapinstance(qObj)
+    else:
+        pointer = long(shiboken.getCppPointer(qObj)[0])
     if type(pointer) == long:
         windowString = mui.MQtUtil.fullName(pointer)
         if windowString:
@@ -152,11 +154,13 @@ def deleteUI(Name):
     :param Name:  QObject name
     :return:
     """
-    qObject = GetQtWidget(Name)
+    qObject = UIExists(Name, AsBool=False)
+    if not qObject:
+        return
     if USE_PYQT_MODULE:
         sip.delete(qObject)
     else:
-        shiboken.delete(qObject)
+        cmds.deleteUI(Name)
 
 
 def loadUi(uiPath):
